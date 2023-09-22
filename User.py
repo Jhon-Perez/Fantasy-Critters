@@ -2,7 +2,7 @@ from mod import *
 import random as rand
 
 IMAGE = pygame.image.load("Assets/stickman.png").convert_alpha()
-PLAYER_IMAGE = pygame.transform.scale(IMAGE, (60, 100))
+PLAYER_IMAGE = pygame.transform.scale(IMAGE, (75, 100))
 SPEED = 5
 
 class User(pygame.sprite.Sprite):
