@@ -18,7 +18,7 @@ from mod import *
 #     def draw(self):
 #         wn.blit(self.image, (self.rect.x, self.rect.y))
 
-IMAGE = pygame.image.load("Assets/tempGrass.png").convert_alpha()
+IMAGE = pygame.image.load("Assets/bush.png").convert_alpha()
 GRASS_IMAGE = pygame.transform.scale(IMAGE, (60,100))
 
 class Grass(pygame.sprite.Sprite):
