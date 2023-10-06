@@ -22,11 +22,11 @@ IMAGE = pygame.image.load("Assets/tempGrass.png").convert_alpha()
 GRASS_IMAGE = pygame.transform.scale(IMAGE, (60,100))
 
 class Grass(pygame.sprite.Sprite):
-    def __init__(self,x,y):
+    def __init__(self,x,y,spriteGroup):
         super().__init__()
         self.image=GRASS_IMAGE
         self.rect = self.image.get_rect()
-        # spriteGroup.add(self)
+        spriteGroup.add(self)
 
         self.rect.x = x
         self.rect.y = y
