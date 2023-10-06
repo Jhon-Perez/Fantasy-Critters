@@ -30,35 +30,8 @@ class User(pygame.sprite.Sprite):
             self.rect.y += SPEED
             self.moving = True
 
-    def grass(self, grass):
-        collision_tolerance = 10
-        if self.rect.colliderect(grass):
-            # random chance that you get attacked by a critter:
-            if abs(self.rect.top - grass.rect.bottom) < collision_tolerance and self.moving:
-                pass
-
-            if abs(self.rect.bottom - grass.rect.top) < collision_tolerance and self.moving:
-                pass
-
-            if abs(self.rect.right - grass.rect.left) < collision_tolerance and self.moving:
-                pass
-
-            if abs(self.rect.left - grass.rect.right) < collision_tolerance and self.moving:
-                pass
-
     def inventory(self):
         pass
 
     def draw(self):
         wn.blit(self.image, (self.rect.x, self.rect.y))
-
-
-GRASS_IMAGE = "something for now"
-class Grass(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = GRASS_IMAGE
-        #self.rect = self.image.get_rect()
-
-        #self.rect.x = x
-        #self.rect.y = y
