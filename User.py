@@ -35,7 +35,12 @@ class User(pygame.sprite.Sprite):
             self.rect.y += SPEED
             self.moving = True
 
+    # TODO - Jhon make an inventory to hold different critters and items
     def inventory(self):
+        pass
+
+    # TODO - TBD find a way to damage critters and make them vulnerable
+    def attack(self, critter):
         pass
 
     def draw(self):

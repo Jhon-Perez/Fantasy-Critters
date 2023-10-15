@@ -14,7 +14,7 @@ WHITE = (255, 255, 255)
 pygame.display.set_caption("Fantasy Critters")
 
 def main():
-    user = User(0, 0)
+    user = User(WIDTH/2, HEIGHT/2)
 
     grass = pygame.sprite.Group()  #Maybe add this group to have all the grass things
 
@@ -57,18 +57,9 @@ def main():
         user.movement()
         user.draw()
 
-        # which way of styling do you prefer for if statements?
-        # if (pygame.sprite.spritecollideany(user, grass)
-        #         and user.moving):
-        #         and rand.randint(1, 25) == 1
-        #     print("collision")
-        #
-        # or does this look better?
-        if (
-            pygame.sprite.spritecollideany(user, grass)
-            and user.moving 
-            and rand.randint(1, 25) == 1
-        ):
+        if (pygame.sprite.spritecollideany(user, grass)
+                and user.moving
+                and rand.randint(1, 25) == 1):
             print("collision")
 
         pygame.display.update()

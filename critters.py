@@ -4,7 +4,7 @@ IMAGE = pygame.image.load("Assets/pikachu.png").convert_alpha()
 POKEMON_IMAGE = pygame.transform.scale(IMAGE, (60, 100))
 
 class Critter(pygame.sprite.Sprite):
-    def __init__(self, x, y, health, damage,spriteGroup):
+    def __init__(self, x, y, health, damage, spriteGroup):
         super().__init__()
         self.image = POKEMON_IMAGE
         self.rect = self.image.get_rect()
