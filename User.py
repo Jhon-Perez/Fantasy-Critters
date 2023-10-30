@@ -1,10 +1,13 @@
-from mod import *
-import random as rand
+import pygame
+from mod import wn, WIDTH, HEIGHT
+
+PLAYER_WIDTH = 70
+PLAYER_HEIGHT = 85
 
 FRONT_IMAGE = pygame.image.load("Assets/virtaFront.png").convert_alpha()
 BACK_IMAGE = pygame.image.load("Assets/virtaBack.png").convert_alpha()
-PLAYER_FRONT_IMAGE = pygame.transform.scale(FRONT_IMAGE, (70, 85))
-PLAYER_BACK_IMAGE = pygame.transform.scale(BACK_IMAGE, (70, 85))
+PLAYER_FRONT_IMAGE = pygame.transform.scale(FRONT_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
+PLAYER_BACK_IMAGE = pygame.transform.scale(BACK_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
 SPEED = 5
 
 class User(pygame.sprite.Sprite):
@@ -35,8 +38,9 @@ class User(pygame.sprite.Sprite):
             self.rect.y += SPEED
             self.moving = True
 
-
-
+    def is_walking_on_grass(self, sprite_group):
+        for sprite in sprite_group:
+            pass
 
     # TODO - Jhon make an inventory to hold different critters and items
     def inventory(self):

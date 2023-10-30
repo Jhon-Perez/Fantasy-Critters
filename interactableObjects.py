@@ -1,4 +1,5 @@
-from mod import *
+import pygame
+from mod import wn
 
 IMAGE = pygame.image.load("Assets/tempGrass.png").convert_alpha()
 GRASS_IMAGE = pygame.transform.scale(IMAGE, (60,100))
