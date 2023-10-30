@@ -1,6 +1,6 @@
-import pygame, sys, random as rand, time
+import pygame, sys, random as rand
 from mod import wn, WIDTH, HEIGHT
-from User import User, PLAYER_HEIGHT
+from User import User
 from critters import Critter
 from interactableObjects import Grass
 from rooms import Room, check_room
@@ -16,15 +16,15 @@ BLACK = (0, 0, 0)
 pygame.display.set_caption("Fantasy Critters")
 
 def main():
-    user = User(WIDTH/2, HEIGHT/2)
+    user = User(WIDTH/2, HEIGHT/2, 100)
 
     grass = pygame.sprite.Group()
 
     critter_var = 0
 
     critters = pygame.sprite.Group()
-    critter1 = Critter(300, 100,  100, 5, "bob", critters)
-    critter2 = Critter(350, 150,  100, 5, "alex", critters)
+    critter1 = Critter(300, 100,  100, 15, "bob", 25, critters)
+    critter2 = Critter(350, 150,  100, 25, "alex", 50, critters)
     choice_critter = critter1
 
     rooms = [
@@ -51,7 +51,7 @@ def main():
 
     current_room = rooms[0]
     check_grass = current_room
-    fight_run=""
+    fight_run = ""
     fight_run_font = False
     menu_selection = False
     attack_choice_screen_font = False
@@ -68,12 +68,14 @@ def main():
                     grass.add(Grass(increment_x * x + start_x, increment_y * y + start_y))
     place_grass(rooms[0].grass, 0, 0, 60, 100)
 
+    # BUG: Grass doesn't change when going back to the first room ONLY if a fight with a critter hasn't occured
     def place_room_grass(current_room, check_grass):
         if check_grass == current_room:
             pass
         elif current_room != fighting_room:
             index = rooms.index(current_room)
             grass.empty()
+            check_grass = current_room
             # Change into if statements if these parameters need to change
             place_grass(rooms[index].grass, 0, 0, 60, 100)
 
@@ -100,6 +102,10 @@ def main():
             user.movement()
             user.draw()
 
+        # TODO: maybe figure out a way to replace time.delay so that the user has
+        # to press a button to continue so they can read at their own pace. There
+        # are multiple time.delay throught the program so if you can figure that
+        # out here than replace it throught the program.
         if menu_selection:
             fight_run = fighting_room.attack_room_menu_selection()
             if fight_run != None:
@@ -107,14 +113,14 @@ def main():
                 menu_selection = False
                 if fight_run == 'fight':
                     wn.blit(current_room.image, current_room.rect)
-                    time.sleep(0.25)
+                    pygame.time.delay(250)
                     attack_choice_screen_font = True
                 else:
-                    running_font=True
+                    running_font = True
         
         if running_font:
             fighting_room.running_font()
-            time.sleep(1)
+            pygame.time.delay(1000)
             current_room=before_room
             running_font=False
 
@@ -130,9 +136,9 @@ def main():
                 attack_font = True
 
         if attack_font:
-            fighting_room.attack_font(choice_critter, attack)
+            fighting_room.attack_font(user, choice_critter, attack)
             attack_font = False
-            time.sleep(1.5)
+            pygame.time.delay(1500)
             if choice_critter.health > 0:
                 attack_selection = True
                 attack_choice_screen_font = True
@@ -150,7 +156,7 @@ def main():
                     and user.moving and rand.randint(1, 10) == 1):
                 critter_var = rand.randint(1,2)
                 grass.empty()
-                before_room,current_room = current_room, fighting_room
+                before_room, current_room = current_room, fighting_room
                 check_grass = current_room
                 fight_run_font = True
                 menu_selection = True
