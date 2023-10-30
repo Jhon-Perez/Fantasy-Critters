@@ -44,6 +44,11 @@ class Room(pygame.sprite.Sprite):
     # organizing, making sure the objects are seperated.
     # You can tell these methods don't belong when self is
     # an unused variable
+
+    #Okay so I tried to take them out of here and have no self
+    #because I noticed I wasn't using them but when I did that 
+    #it just didn't work, like at all, and I had no clue why it 
+    #wasn't working, so I just put them back here
     def fighting_fight_run_room_fun(self, fight_run):
         myfont = pygame.font.SysFont("monospace", 50)
         run_label = myfont.render(f"2: Run Away", 1, BLACK)
