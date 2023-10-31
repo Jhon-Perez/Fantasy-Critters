@@ -13,7 +13,7 @@ SPEED = 5
 class User(pygame.sprite.Sprite):
     moving = False
     score = 0
-    # instead of self it is now Jhon because Jhon is cool (not really he is kinda lame tbh)
+    # instead of self it is now Jhon because Jhon is cool (not really he is kinda lame tbh-Agreed)
     def __init__(Jhon, x, y, health):
         super().__init__()
         Jhon.image = PLAYER_FRONT_IMAGE
