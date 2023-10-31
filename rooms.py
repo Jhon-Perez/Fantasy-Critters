@@ -1,6 +1,6 @@
 import pygame
-from mod import wn, WIDTH
-from questions import questions
+from mod import wn, WIDTH, HEIGHT
+from questions import question_list
 
 key_mapping = {
     pygame.K_1: 1,
@@ -18,16 +18,7 @@ class Room(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = location
         self.grass = grass
-        
-    # TODO - Brett figure out how to place different items in
-    # different rooms. IDK maybe using parameters, possibly switch statement
-    def add_gameplay(self):
-        room = 1
-        if self.place_grass:
-            self.place_grass = True
 
-    # TODO - Brett make a room to brutally beat critters and possibly
-    # catch them
     def attack_room_menu_selection(self):
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_1]:
@@ -43,12 +34,7 @@ class Room(pygame.sprite.Sprite):
     # They have no correlation to rooms. In the future when 
     # organizing, making sure the objects are seperated.
     # You can tell these methods don't belong when self is
-    # an unused variable
-
-    #Okay so I tried to take them out of here and have no self
-    #because I noticed I wasn't using them but when I did that 
-    #it just didn't work, like at all, and I had no clue why it 
-    #wasn't working, so I just put them back here
+    # an unused variable. Don't worry about this it's just a reminder
     def fighting_fight_run_room_fun(self, fight_run):
         myfont = pygame.font.SysFont("monospace", 50)
         run_label = myfont.render(f"2: Run Away", 1, BLACK)
@@ -88,12 +74,15 @@ class Room(pygame.sprite.Sprite):
             wn.blit(attack_label, (10, 350 + 50 * i))
         pygame.display.update()
 
+    # TODO NOW
+    # look at the example I have provided in questions.py if anything needs to be changed on my part
+    # let me know so I can get at it right away. For now try to work with what is provided and if
+    # you can manage to get it working yourself then that would be great, perfect, and awesome.
     def ask_question(self):
         myfont = pygame.font.SysFont("monspace", 50)
-        question = questions[0]
-        print(question)
 
-    def attack_font(self, critter, choice):
+
+    def attack_font(self, user, critter, choice):
         myfont = pygame.font.SysFont("monospace", 35)
         if critter.health < 0:
             health = 0
@@ -105,7 +94,16 @@ class Room(pygame.sprite.Sprite):
             myfont.render(f"{critter.name} took 10 dmg, {critter.name} is now at {health} health", 1, BLACK),
             myfont.render(f"{critter.name} took ∞ dmg, {critter.name} is now at {health} health", 1, BLACK)
         ]
+        damage_taken = myfont.render(f"Player took {critter.damage} and is now at {user.health} health", 1, BLACK)
         wn.blit(attack_labels[choice - 1], (10, 425))
+        wn.blit(damage_taken, (10, 500))
+
+        if user.health <= 0:
+            wn.blit(myfont.render(f"You died :(", 1, BLACK), (WIDTH/2 - 50, HEIGHT/2 - 50))
+            pygame.display.update()
+            pygame.time.delay(2500)
+            pygame.quit()
+
         pygame.display.update()
 
 
