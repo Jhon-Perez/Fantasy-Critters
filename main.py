@@ -50,7 +50,7 @@ def main():
     before_room = rooms[0]
 
     current_room = rooms[0]
-    check_grass = current_room
+    current_grass = None
     fight_run = ""
     fight_run_font = False
     menu_selection = False
@@ -59,25 +59,25 @@ def main():
     attack_font = False
     attack = 0
     running_font = False
+    ask_question = False
+    selection = 0
 
     # gets an array of strings and places grass on all x's
     def place_grass(places, start_x, start_y, increment_x, increment_y):
         for y in range(len(places)):
             for x in range(len(places[y])):
-                if places[y][x] == "x":
+                if places[y][x] == 'x':
                     grass.add(Grass(increment_x * x + start_x, increment_y * y + start_y))
     place_grass(rooms[0].grass, 0, 0, 60, 100)
 
-    # BUG: Grass doesn't change when going back to the first room ONLY if a fight with a critter hasn't occured
-    def place_room_grass(current_room, check_grass):
-        if check_grass == current_room:
+    def place_room_grass(current_room, current_grass):
+        if current_grass == current_room.grass:
             pass
         elif current_room != fighting_room:
-            index = rooms.index(current_room)
             grass.empty()
-            check_grass = current_room
-            # Change into if statements if these parameters need to change
-            place_grass(rooms[index].grass, 0, 0, 60, 100)
+            current_grass = current_room.grass
+            # Change into if statements if these parameters need to change for different rooms
+            place_grass(current_grass, 0, 0, 60, 100)
 
     while True:
         for event in pygame.event.get():
@@ -86,7 +86,7 @@ def main():
                 sys.exit()
         current_room = check_room(user.rect, current_room, rooms, fighting_room)
         wn.blit(current_room.image, current_room.rect)
-        place_room_grass(current_room, check_grass)
+        place_room_grass(current_room, current_grass)
 
         for g in grass:
             g.draw()
@@ -106,49 +106,54 @@ def main():
         # to press a button to continue so they can read at their own pace. There
         # are multiple time.delay throught the program so if you can figure that
         # out here than replace it throught the program.
-        if menu_selection:
+
+        # SELECTION:
+        # 0 -> Not currently fighting
+        # 1 -> Select whether to fight or run
+        # 2 -> Display running text / move onto 3
+        # 3 -> Ask the user which attack they want to use
+        # 4 -> Check whether the critter is dead or not
+        # 5 -> Ask a question and do something based of if the user is correct
+        if selection == 1:
             fight_run = fighting_room.attack_room_menu_selection()
-            if fight_run != None:
-                fight_run_font = False
-                menu_selection = False
-                if fight_run == 'fight':
-                    wn.blit(current_room.image, current_room.rect)
-                    pygame.time.delay(250)
-                    attack_choice_screen_font = True
-                else:
-                    running_font = True
-        
-        if running_font:
-            fighting_room.running_font()
-            pygame.time.delay(1000)
-            current_room=before_room
-            running_font=False
-
-        if fight_run_font:
             fighting_room.fighting_fight_run_room_fun(fight_run)
-
-        if attack_selection:
+            if fight_run != None:
+                selection = 2
+        elif selection == 2:
+            if fight_run == "fight":
+                selection = 3
+                # BUG this is temporary. Right now if I hold 1 it will also immediately choose 1 for the
+                # next selection from the previous selection. Right know I don't care about this and it will 
+                # stay because I want to focus on making a game that can be presented rather than functional.
+                pygame.time.delay(500)
+            elif fight_run == "run":
+                fighting_room.running_font()
+                pygame.time.delay(1000)
+                current_room = before_room
+                selection = 0
+        elif selection == 3:
+            fighting_room.fighting_game_loop()
             attack = fighting_room.attack_selection()
             if attack != None:
-                attack_selection = False
-                attack_choice_screen_font = False
-                user.attack(choice_critter, attack)
-                attack_font = True
-
-        if attack_font:
-            fighting_room.attack_font(user, choice_critter, attack)
-            attack_font = False
-            pygame.time.delay(1500)
+                selection = 4
+        elif selection == 4:
             if choice_critter.health > 0:
-                attack_selection = True
-                attack_choice_screen_font = True
+                selection = 5
             else:
                 choice_critter.health = 100
                 current_room = before_room
-
-        if attack_choice_screen_font:
-            fighting_room.fighting_game_loop()
-            attack_selection = True
+                selection = 0
+        elif selection == 5:
+            correct = fighting_room.ask_question()
+            if correct:
+                user.attack(choice_critter, attack)
+                fighting_room.attack_font(user, choice_critter, attack)
+                pygame.time.delay(1500)
+            else:
+                user.attack(choice_critter, 0)
+                fighting_room.wrong_attack_font(user, choice_critter)
+                pygame.time.delay(1500)
+            selection = 3
 
         bottom_rect = pygame.Rect(user.rect.left, user.rect.bottom - 10, user.rect.width, 10)
         for sprite in grass:
@@ -157,10 +162,12 @@ def main():
                 critter_var = rand.randint(1,2)
                 grass.empty()
                 before_room, current_room = current_room, fighting_room
-                check_grass = current_room
+                current_grass = None
                 fight_run_font = True
                 menu_selection = True
+                selection = 1
 
+        wn.blit(myfont.render(f"Score: {user.score}", 1, BLACK), (0, 0))
         pygame.display.update()
         clock.tick(FPS)
 

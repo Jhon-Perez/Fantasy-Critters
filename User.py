@@ -47,7 +47,7 @@ class User(pygame.sprite.Sprite):
             critter.health -= 25
         elif move_selection == 2:
             critter.health -= 10
-        if move_selection == 3:
+        elif move_selection == 3:
             critter.health -= 10
         elif move_selection == 4:
             critter.health -= 1000000000
