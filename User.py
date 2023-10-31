@@ -12,56 +12,55 @@ SPEED = 5
 
 class User(pygame.sprite.Sprite):
     moving = False
-    def __init__(self, x, y):
+    score = 0
+    # instead of self it is now Jhon because Jhon is cool (not really he is kinda lame tbh)
+    def __init__(Jhon, x, y, health):
         super().__init__()
-        self.image = PLAYER_FRONT_IMAGE
-        self.rect = self.image.get_rect()
+        Jhon.image = PLAYER_FRONT_IMAGE
+        Jhon.rect = Jhon.image.get_rect()
+        Jhon.health = health
 
-        self.rect.x = x
-        self.rect.y = y
+        Jhon.rect.x = x
+        Jhon.rect.y = y
 
-    def movement(self):
+    def movement(Jhon):
         keys_pressed = pygame.key.get_pressed()
-        self.moving = False
-        if keys_pressed[pygame.K_a] and self.rect.x - SPEED > 0:
-            self.rect.x -= SPEED
-            self.moving = True
-        if keys_pressed[pygame.K_d] and self.rect.x - SPEED + self.rect.width < WIDTH:
-            self.rect.x += SPEED
-            self.moving = True
-        if keys_pressed[pygame.K_w] and self.rect.y - SPEED > 0:
-            self.image = PLAYER_BACK_IMAGE
-            self.rect.y -= SPEED
-            self.moving = True
-        if keys_pressed[pygame.K_s] and self.rect.y + SPEED + self.rect.height < HEIGHT:
-            self.image = PLAYER_FRONT_IMAGE
-            self.rect.y += SPEED
-            self.moving = True
+        Jhon.moving = False
+        if keys_pressed[pygame.K_a] and Jhon.rect.x - SPEED > 0:
+            Jhon.rect.x -= SPEED
+            Jhon.moving = True
+        if keys_pressed[pygame.K_d] and Jhon.rect.x - SPEED + Jhon.rect.width < WIDTH:
+            Jhon.rect.x += SPEED
+            Jhon.moving = True
+        if keys_pressed[pygame.K_w] and Jhon.rect.y - SPEED > 0:
+            Jhon.image = PLAYER_BACK_IMAGE
+            Jhon.rect.y -= SPEED
+            Jhon.moving = True
+        if keys_pressed[pygame.K_s] and Jhon.rect.y + SPEED + Jhon.rect.height < HEIGHT:
+            Jhon.image = PLAYER_FRONT_IMAGE
+            Jhon.rect.y += SPEED
+            Jhon.moving = True
 
-    def is_walking_on_grass(self, sprite_group):
-        for sprite in sprite_group:
-            pass
-
-    # TODO - Jhon make an inventory to hold different critters and items
-    def inventory(self):
-        pass
-
-    # TODO - TBD find a way to damage critters and make them vulnerable
-    def attack(self, critter, move_selection):
+    def attack(Jhon, critter, move_selection):
         print(critter.health)
-        if move_selection==1:
-            critter.health-=25
+        if move_selection == 1:
+            critter.health -= 25
+        elif move_selection == 2:
+            critter.health -= 10
+        if move_selection == 3:
+            critter.health -= 10
+        elif move_selection == 4:
+            critter.health -= 1000000000
 
-        if move_selection==2:
-            critter.health-=10
-
-        if move_selection==3:
-            critter.health-=10
-
-        if move_selection==4:
-            critter.health-=1000000000
+        if critter.health > 0:
+            Jhon.health -= critter.damage
+            if Jhon.health < 0:
+                Jhon.health = 0
+        else:
+            Jhon.score += critter.score
             
         print(critter.health)
+        print(Jhon.health)
 
-    def draw(self):
-        wn.blit(self.image, (self.rect.x, self.rect.y))
+    def draw(Jhon):
+        wn.blit(Jhon.image, (Jhon.rect.x, Jhon.rect.y))
