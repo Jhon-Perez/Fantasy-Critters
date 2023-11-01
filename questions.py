@@ -1,4 +1,5 @@
-import csv
+import csv, pygame, random as rand
+from mod import wn, WIDTH
 
 # If you want questions added then use the csv file and it will be put into the list as shown.
 # If you haven't already, install rainbow csv it will make your life so much easier to see. 
@@ -9,6 +10,93 @@ with open("questions.csv") as file:
     csv_reader = csv.reader(file)
     next(csv_reader)
     question_list = [row for row in csv_reader]
+
+text_box = pygame.image.load("Assets/text_box.png").convert_alpha()
+text_box = pygame.transform.scale(text_box, (780, 300))
+
+BLACK = (0, 0, 0)
+
+key_mapping = {
+    pygame.K_1: 1,
+    pygame.K_2: 2,
+    pygame.K_3: 3,
+    pygame.K_4: 4
+}
+
+def format_text(passage: str, max_line_length = 50):
+    # Splits the passage into different lines so that the print looks nice.
+    # this might need to change into a list of strings over new line characters
+    # when making the text on the actual text
+    formatted_text = []
+    current_line = ""
+
+    words = passage.split()
+    for word in words:
+        # Check if adding the word to the current line would exceed the maximum line length
+        if len(current_line) + len(word) + 1 <= max_line_length:
+            if current_line:
+                current_line += " "
+            current_line += word
+        # If adding the word would exceed the line length, start a new line    
+        else:
+            formatted_text.append(current_line)
+            current_line = word
+    formatted_text.append(current_line)
+    return formatted_text
+
+class Question:
+    passage = []
+    formatted_question = []
+    answer = ""
+    random_choices = []
+    def clear(self):
+        self.passage = []
+        self.formatted_question = []
+        self.answer = ""
+        self.random_choices = []
+
+    def new_question(self):
+        pick = rand.randrange(0, len(question_list))
+        self.passage = question_list[pick]
+
+        self.formatted_question = format_text(self.passage[1])
+
+        self.answer = self.passage[7]
+
+        self.random_choices = self.passage[3:7]
+
+    def attack_selection(self):
+        return next(iter([value for key, value in key_mapping.items() if pygame.key.get_pressed()[key]]), None)
+
+    def display_question(self):
+        myfont = pygame.font.SysFont("monospace", 25)
+        title = myfont.render(f"{self.passage[0]}", 1, BLACK)
+        formatted_text = format_text(self.passage[2])
+        question = [myfont.render(f"{line}", 1, BLACK) for line in formatted_text]
+        #question = myfont.render(f"{self.passage[2]}", 1, BLACK)
+        random_text_choices = [
+            myfont.render(f"{1}. {self.random_choices[0]}", 1, BLACK),
+            myfont.render(f"{2}. {self.random_choices[1]}", 1, BLACK),
+            myfont.render(f"{3}. {self.random_choices[2]}", 1, BLACK),
+            myfont.render(f"{4}. {self.random_choices[3]}", 1, BLACK)
+        ]
+        # answer_font = myfont.render(f"{answer}", 1, BLACK)
+
+        wn.blit(text_box, (50, 40))
+        wn.blit(title, (WIDTH/2 - len(self.passage[0]) * 8, 60)) # The name of the text
+        for i, line in enumerate(self.formatted_question):
+            wn.blit(myfont.render(f"{line}", 1, BLACK), (WIDTH/2 - len(line) * 8 + 10, 25 * i + 100))
+        wn.blit(random_text_choices[0], (50, 410))
+        wn.blit(random_text_choices[1], (50, 440)) # sometimes these questions are overlapping but it
+        wn.blit(random_text_choices[2], (50, 470)) # should be fine for a proof of concept
+        wn.blit(random_text_choices[3], (50, 500))
+        for i, (line, size) in enumerate(zip(reversed(question), reversed(formatted_text))):
+            wn.blit(line, (WIDTH/2 - len(size) * 8, 290 - 50 * i)) # the question we are asking
+
+        pygame.display.update()
+
+        if (choice := self.attack_selection()) != None:
+            return choice == int(self.answer)
 
 # A more organized version of the csv file would look like this:
 # Passage 1: "The Friendly Owl"

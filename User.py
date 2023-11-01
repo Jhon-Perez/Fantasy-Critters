@@ -1,48 +1,74 @@
 import pygame
-from mod import wn, WIDTH, HEIGHT
+from mod import wn, WIDTH, HEIGHT, get_image
 
-PLAYER_WIDTH = 70
-PLAYER_HEIGHT = 85
+PLAYER_WIDTH = 73
+PLAYER_HEIGHT = 100
 
-FRONT_IMAGE = pygame.image.load("Assets/virtaFront.png").convert_alpha()
-BACK_IMAGE = pygame.image.load("Assets/virtaBack.png").convert_alpha()
-PLAYER_FRONT_IMAGE = pygame.transform.scale(FRONT_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
-PLAYER_BACK_IMAGE = pygame.transform.scale(BACK_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
 SPEED = 5
+
+# I wish you made the sprites the same distance away like a PROPER sprite sheet :)
+PLAYER_IMAGE = pygame.image.load("Assets/Sprite_Sheet.png").convert_alpha()
+animation_list = [
+    [
+        get_image(PLAYER_IMAGE, 50, 15, 0, PLAYER_WIDTH, PLAYER_HEIGHT),
+        get_image(PLAYER_IMAGE, 145, 15, 1, PLAYER_WIDTH, PLAYER_HEIGHT),
+        get_image(PLAYER_IMAGE, 240, 15, 2, PLAYER_WIDTH-5, PLAYER_HEIGHT),
+        get_image(PLAYER_IMAGE, 320, 15, 3, PLAYER_WIDTH, PLAYER_HEIGHT),
+    ],
+    [
+        get_image(PLAYER_IMAGE, 50, 115, 0, PLAYER_WIDTH, PLAYER_HEIGHT),
+        get_image(PLAYER_IMAGE, 145, 115, 1, PLAYER_WIDTH, PLAYER_HEIGHT),
+        get_image(PLAYER_IMAGE, 240, 115, 2, PLAYER_WIDTH-5, PLAYER_HEIGHT),
+        get_image(PLAYER_IMAGE, 320, 115, 3, PLAYER_WIDTH, PLAYER_HEIGHT),
+    ]
+]
 
 class User(pygame.sprite.Sprite):
     moving = False
     score = 0
-    # instead of self it is now Jhon because Jhon is cool (not really he is kinda lame tbh-Agreed)
-    def __init__(Jhon, x, y, health):
+    frame = 1
+    last_update = pygame.time.get_ticks()
+    def __init__(self, x, y, health):
         super().__init__()
-        Jhon.image = PLAYER_FRONT_IMAGE
-        Jhon.rect = Jhon.image.get_rect()
-        Jhon.health = health
+        self.image = animation_list[0][0]
+        self.rect = self.image.get_rect()
+        self.health = health
 
-        Jhon.rect.x = x
-        Jhon.rect.y = y
+        self.rect.x = x
+        self.rect.y = y
 
-    def movement(Jhon):
+    def movement(self, current_time, animation_cooldown):
         keys_pressed = pygame.key.get_pressed()
-        Jhon.moving = False
-        if keys_pressed[pygame.K_a] and Jhon.rect.x - SPEED > 0:
-            Jhon.rect.x -= SPEED
-            Jhon.moving = True
-        if keys_pressed[pygame.K_d] and Jhon.rect.x - SPEED + Jhon.rect.width < WIDTH:
-            Jhon.rect.x += SPEED
-            Jhon.moving = True
-        if keys_pressed[pygame.K_w] and Jhon.rect.y - SPEED > 0:
-            Jhon.image = PLAYER_BACK_IMAGE
-            Jhon.rect.y -= SPEED
-            Jhon.moving = True
-        if keys_pressed[pygame.K_s] and Jhon.rect.y + SPEED + Jhon.rect.height < HEIGHT:
-            Jhon.image = PLAYER_FRONT_IMAGE
-            Jhon.rect.y += SPEED
-            Jhon.moving = True
+        current_time = pygame.time.get_ticks()
+        self.moving = False
+        if keys_pressed[pygame.K_a] and self.rect.x - SPEED > 0:
+            self.image = animation_list[1][self.frame]
+            if current_time - self.last_update > animation_cooldown:
+                self.frame += 1
+                self.last_update = current_time
+                if self.frame >= 4:
+                    self.frame = 1
+            self.rect.x -= SPEED
+            self.moving = True
+        if keys_pressed[pygame.K_d] and self.rect.x - SPEED + self.rect.width < WIDTH:
+            self.image = animation_list[0][self.frame]
+            if current_time - self.last_update > animation_cooldown:
+                self.frame += 1
+                self.last_update = current_time
+                if self.frame >= 4:
+                    self.frame = 1
+            self.rect.x += SPEED
+            self.moving = True
+        if keys_pressed[pygame.K_w] and self.rect.y - SPEED > 0:
+            self.image = animation_list[1][0]
+            self.rect.y -= SPEED
+            self.moving = True
+        if keys_pressed[pygame.K_s] and self.rect.y + SPEED + self.rect.height < HEIGHT:
+            self.image = animation_list[0][0]
+            self.rect.y += SPEED
+            self.moving = True
 
-    def attack(Jhon, critter, move_selection):
-        print(critter.health)
+    def attack(self, critter, move_selection):
         if move_selection == 1:
             critter.health -= 25
         elif move_selection == 2:
@@ -53,14 +79,38 @@ class User(pygame.sprite.Sprite):
             critter.health -= 1000000000
 
         if critter.health > 0:
-            Jhon.health -= critter.damage
-            if Jhon.health < 0:
-                Jhon.health = 0
+            self.health -= critter.damage
+            if self.health < 0:
+                self.health = 0
         else:
-            Jhon.score += critter.score
-            
-        print(critter.health)
-        print(Jhon.health)
+            self.score += critter.score
 
-    def draw(Jhon):
-        wn.blit(Jhon.image, (Jhon.rect.x, Jhon.rect.y))
+    def draw(self):
+        wn.blit(self.image, (self.rect.x, self.rect.y))
+
+if __name__ == "__main__":
+    import sys
+    pygame.init()
+    clock = pygame.time.Clock()
+    FPS = 60
+    current_time = 0
+    animation_cooldown = 250
+
+    user = User(WIDTH/2, HEIGHT/2, 99999999)
+    
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        wn.fill((200, 255, 255))
+
+        for i, row in enumerate(animation_list):
+            for j, sprite in enumerate(row):
+                wn.blit(sprite, (j * 90 + 5, 100 * i + 10))
+    
+        user.movement(current_time, animation_cooldown)
+        user.draw()
+
+        pygame.display.update()
+        clock.tick(FPS)
